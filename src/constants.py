@@ -1,5 +1,8 @@
 import requests
 from colr import color
+from src.requestsV import Requests
+
+VALOAPI = Requests.VALOAPI()[0]
 
 version = "2.32"
 enablePrivateLogging = True
@@ -60,7 +63,9 @@ AGENTCOLORLIST = {
         }
 
 
-GAMEPODS = requests.get("https://valorant-api.com/internal/locres/en-US").json()["data"]["UI_GamePodStrings"]
+
+GAMEPODS = VALOAPI["internal"]
+
 
 symbol = "■"
 PARTYICONLIST = [
