@@ -11,6 +11,9 @@ import zipfile
 import io
 import subprocess
 
+
+valo_api = []
+
 class Requests:
     def __init__(self, version, log, Error):
         self.Error = Error
@@ -195,3 +198,25 @@ class Requests:
             }
             self.headers = headers
         return self.headers
+
+
+    @staticmethod
+    def valApi():
+        endpoint_names = ["/v1/weapons", "/internal/locres/en-US", "/v1/maps", "/v1/sprays", "/v1/buddies", "/v1/agents", "/v1/playertitles", "/v1/playercards"]
+        base = "https://valorant-api.com"
+        
+        valo_api.append(
+            {
+                "weapons" : requests.get(base + endpoint_names[0]).json()["data"],
+                "internal" : requests.get(base + endpoint_names[1]).json()["data"]["UI_GamePodStrings"],
+                "maps" : requests.get(base + endpoint_names[2]).json()["data"],
+                "sprays" : requests.get(base + endpoint_names[3]).json()["data"],
+                "buddies" : requests.get(base + endpoint_names[4]).json()["data"],
+                "agents" : requests.get(base + endpoint_names[5]).json()["data"],
+                "playertitles": requests.get(base + endpoint_names[6]).json()["data"],
+                "playercards" : requests.get(base + endpoint_names[7]).json()["data"]
+            }
+        )
+
+        return valo_api
+
