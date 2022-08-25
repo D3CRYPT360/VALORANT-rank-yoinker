@@ -46,6 +46,7 @@ def program_exit(status: int):  # so we don't need to import the entire sys modu
     log(f"exited program with error code {status}")
     raise sys.exit(status)
 
+VALOAPI = Requests.VALOAPI()[0]
 
 
 try:
@@ -119,7 +120,7 @@ try:
 
 
 
-    valoApiSkins = requests.get("https://valorant-api.com/v1/weapons/skins")
+    valoApiSkins = VALOAPI["skins"]
     gameContent = content.get_content()
     seasonID = content.get_latest_season_id(gameContent)
     lastGameState = ""
