@@ -1,4 +1,7 @@
 import requests
+from src.requestsV import Requests
+
+VALOAPI = Requests.VALOAPI()
 
 class Content():
     def __init__(self, Requests, log):
@@ -17,7 +20,7 @@ class Content():
                 return season["ID"]
 
     def get_all_agents(self):
-        rAgents = requests.get("https://valorant-api.com/v1/agents?isPlayableCharacter=true").json()
+        rAgents = VALOAPI["agents"]
         agent_dict = {}
         agent_dict.update({None: None})
         agent_dict.update({"": ""})
@@ -27,7 +30,7 @@ class Content():
         return agent_dict
 
     def get_maps(self):
-        rMaps = requests.get("https://valorant-api.com/v1/maps").json()
+        rMaps = VALOAPI["maps"]
         map_dict = {}
         map_dict.update({None: None})
         for Vmap in rMaps["data"]:
