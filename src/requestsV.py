@@ -12,7 +12,7 @@ import io
 import subprocess
 
 
-valo_api = []
+VALOAPI = []
 
 class Requests:
     def __init__(self, version, log, Error):
@@ -208,10 +208,10 @@ class Requests:
 
     @staticmethod
     def valApi():
-        endpoint_names = ["/v1/weapons", "/internal/locres/en-US", "/v1/maps", "/v1/sprays", "/v1/buddies", "/v1/agents", "/v1/playertitles", "/v1/playercards"]
+        endpoint_names = ["/v1/weapons", "/internal/locres/en-US", "/v1/maps", "/v1/sprays", "/v1/buddies", "/v1/agents?isPlayableCharacter=true", "/v1/playertitles", "/v1/playercards", "/v1/weapons/skins"]
         base = "https://valorant-api.com"
         
-        valo_api.append(
+        VALOAPI.append(
             {
                 "weapons" : requests.get(base + endpoint_names[0]).json()["data"],
                 "internal" : requests.get(base + endpoint_names[1]).json()["data"]["UI_GamePodStrings"],
@@ -220,9 +220,17 @@ class Requests:
                 "buddies" : requests.get(base + endpoint_names[4]).json()["data"],
                 "agents" : requests.get(base + endpoint_names[5]).json()["data"],
                 "playertitles": requests.get(base + endpoint_names[6]).json()["data"],
-                "playercards" : requests.get(base + endpoint_names[7]).json()["data"]
+                "playercards" : requests.get(base + endpoint_names[7]).json()["data"],
+                "skins" : requests.get(base + endpoint_names[8]).json()["data"]
             }
         )
 
-        return valo_api
+        return VALOAPI
+
+    @staticmethod
+    def VALOAPI():
+        return VALOAPI
+
+
+Requests.valApi()
 
