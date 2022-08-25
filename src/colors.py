@@ -34,7 +34,7 @@ class Colors:
 
 
     def get_rgb_color_from_skin(self, skin_id, valoApiSkins):
-        for skin in valoApiSkins.json()["data"]:
+        for skin in valoApiSkins.json():
             if skin_id == skin["uuid"]:
                 return self.tier_dict[skin["contentTierUuid"]]
 
