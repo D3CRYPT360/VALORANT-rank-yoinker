@@ -4,7 +4,12 @@ import requests
 from colr import color
 from src.constants import sockets, hide_names
 import json
+from src.requestsV import Requests
+
 # import pyperclip
+
+
+VALOAPI = Requests.VALOAPI()[0]
 
 class Loadouts:
     def __init__(self, Requests, log, colors, Server):
@@ -17,7 +22,7 @@ class Loadouts:
     def get_match_loadouts(self, match_id, players, weaponChoose, valoApiSkins, names, state="game"):
         playersBackup = players
         weaponLists = {}
-        valApiWeapons = requests.get("https://valorant-api.com/v1/weapons").json()
+        valApiWeapons = VALOAPI["weapons"]
         if state == "game":
             team_id = "Blue"
             PlayerInventorys = self.Requests.fetch("glz", f"/core-game/v1/matches/{match_id}/loadouts", "get")
@@ -39,7 +44,7 @@ class Loadouts:
                     skin_id = \
                         inv["Items"][weapon["uuid"].lower()]["Sockets"]["bcef87d6-209b-46c6-8b19-fbe40bd95abc"]["Item"][
                             "ID"]
-                    for skin in valoApiSkins.json()["data"]:
+                    for skin in valoApiSkins:
                         if skin_id.lower() == skin["uuid"].lower():
                             rgb_color = self.colors.get_rgb_color_from_skin(skin["uuid"].lower(), valoApiSkins)
                             # if rgb_color is not None:
@@ -56,12 +61,12 @@ class Loadouts:
         #get agent dict from main in future
         # pyperclip.copy(json.dumps(PlayerInventorys))
         # names = self.namesClass.get_names_from_puuids(players)
-        valoApiSprays = requests.get("https://valorant-api.com/v1/sprays")
-        valoApiWeapons = requests.get("https://valorant-api.com/v1/weapons")
-        valoApiBuddies = requests.get("https://valorant-api.com/v1/buddies")
-        valoApiAgents = requests.get("https://valorant-api.com/v1/agents")
-        valoApiTitles = requests.get("https://valorant-api.com/v1/playertitles")
-        valoApiPlayerCards = requests.get("https://valorant-api.com/v1/playercards")
+        valoApiSprays = VALOAPI["sprays"]
+        valoApiWeapons = VALOAPI["weapons"]
+        valoApiBuddies = VALOAPI["buddies"]
+        valoApiAgents = VALOAPI["agents"]
+        valoApiTitles = VALOAPI["playertitles"]
+        valoApiPlayerCards = VALOAPI["playercards"]
         final_final_json = {"Players": {}}
 
         final_final_json.update({"time": int(time.time())})
@@ -78,7 +83,7 @@ class Loadouts:
 
                 #creates name field
                 if hide_names:
-                    for agent in valoApiAgents.json()["data"]:
+                    for agent in valoApiAgents:
                         if agent["uuid"] == players[i]["CharacterID"]:
                             final_json[players[i]["Subject"]].update({"Name": agent["displayName"]})
                 else:
@@ -93,16 +98,16 @@ class Loadouts:
 
                 final_json[players[i]["Subject"]].update({"Level": players[i]["PlayerIdentity"]["AccountLevel"]})
 
-                for title in valoApiTitles.json()["data"]:
+                for title in valoApiTitles:
                     if title["uuid"] == players[i]["PlayerIdentity"]["PlayerTitleID"]:
                         final_json[players[i]["Subject"]].update({"Title": title["titleText"]})
 
 
-                for PCard in valoApiPlayerCards.json()["data"]:
+                for PCard in valoApiPlayerCards:
                     if PCard["uuid"] == players[i]["PlayerIdentity"]["PlayerCardID"]:
                         final_json[players[i]["Subject"]].update({"PlayerCard": PCard["largeArt"]})
 
-                for agent in valoApiAgents.json()["data"]:
+                for agent in valoApiAgents:
                     if agent["uuid"] == players[i]["CharacterID"]:
                         final_json[players[i]["Subject"]].update({"AgentArtworkName": agent["displayName"] + "Artwork"})
                         final_json[players[i]["Subject"]].update({"Agent": agent["displayIcon"]})
@@ -110,7 +115,7 @@ class Loadouts:
                 for j in range(len(PlayerInventory["Sprays"]["SpraySelections"])):
                     spray = PlayerInventory["Sprays"]["SpraySelections"][j]
                     final_json[players[i]["Subject"]]["Sprays"].update({j: {}})
-                    for sprayValApi in valoApiSprays.json()["data"]:
+                    for sprayValApi in valoApiSprays:
                         if spray["SprayID"] == sprayValApi["uuid"]:
                             final_json[players[i]["Subject"]]["Sprays"][j].update({
                                 "displayName": sprayValApi["displayName"],
@@ -143,7 +148,7 @@ class Loadouts:
                     #buddies
                     for socket in PlayerInventory["Items"][skin]["Sockets"]:
                         if sockets["skin_buddy"] == socket:
-                            for buddy in valoApiBuddies.json()["data"]:
+                            for buddy in valoApiBuddies:
                                 if buddy["uuid"] == PlayerInventory["Items"][skin]["Sockets"][socket]["Item"]["ID"]:
                                     final_json[players[i]["Subject"]]["Weapons"][skin].update(
                                         {
@@ -152,7 +157,7 @@ class Loadouts:
                                     )
 
                     #append names to field
-                    for weapon in valoApiWeapons.json()["data"]:
+                    for weapon in valoApiWeapons.json():
                         if skin == weapon["uuid"]:
                             final_json[players[i]["Subject"]]["Weapons"][skin].update(
                                 {
