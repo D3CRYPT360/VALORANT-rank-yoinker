@@ -4,9 +4,11 @@ import ssl
 import base64
 import json
 from colr import color
+import re
+
 
 class Ws:
-    def __init__(self, lockfile, Requests, cfg, colors, hide_names, chatlog):
+    def __init__(self, lockfile, Requests, cfg, colors, hide_names, chatlog, rpc):
 
         self.lockfile = lockfile
         self.Requests = Requests
@@ -24,6 +26,7 @@ class Ws:
         self.up = "\033[A"
         self.chat_limit = 5
         self.chatlog = chatlog
+        self.rpc = rpc
 
     def set_player_data(self, player_data):
         self.player_data = player_data
@@ -74,7 +77,10 @@ class Ws:
                         state = json.loads(base64.b64decode(presence['private']))["sessionLoopState"]
                     
                     if state is not None:
+                        self.rpc.set_rpc(json.loads(base64.b64decode(presence['private'])))
                         if state != initial_game_state:
+                            self.messages = 0
+                            self.message_history = []
                             return state
             if resp_json[2].get("uri") == "/chat/v6/messages":
                 message = resp_json[2]["data"]["messages"][0]
@@ -103,13 +109,14 @@ class Ws:
         if self.messages > self.chat_limit:
             print(self.up * self.chat_limit, end="")
             for i in range(len(self.message_history) - self.chat_limit + 1, len(self.message_history)):
-                print(self.message_history[i] + " " * max([0, len(self.message_history[i-1]) - len(self.message_history[i])]))
-            print(message + " " * max([0, len(self.message_history[-1]) - len(message)]))
+                print(self.message_history[i] + " " * max([0, len(self.colors.escape_ansi(self.message_history[i-1])) - len(self.colors.escape_ansi(self.message_history[i]))]))
+            print(message + " " * max([0, len(self.colors.escape_ansi(self.message_history[-1])) - len(self.colors.escape_ansi(message))]))
         else:
             print(message)
 
         self.message_history.append(message)
 
+    
 
 # if __name__ == "__main__":
 #     try:
