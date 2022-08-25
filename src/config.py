@@ -3,6 +3,9 @@ from io import TextIOWrapper
 from json import JSONDecodeError
 import requests
 import os
+from src.requestsV import Requests
+
+VALOAPI = Requests.VALOAPI()
 
 from src.constants import DEFAULT_CONFIG
 
@@ -72,7 +75,7 @@ class Config:
         return jsonToWrite
 
     def weapon_check(self, name):
-        if name in [weapon["displayName"] for weapon in requests.get("https://valorant-api.com/v1/weapons").json()["data"]]:
+        if name in [weapon["displayName"] for weapon in VALOAPI["weapons"]]:
             return True
         else:
             return False
