@@ -112,7 +112,10 @@ try:
 
     stats = Stats()
 
-    rpc = Rpc(map_dict, gamemodes, colors)
+    if cfg.get_feature_flag("discord_rpc"):
+        rpc = Rpc(map_dict, gamemodes, colors)
+    else:
+        rpc = None
 
     Wss = Ws(Requests.lockfile, Requests, cfg, colors, hide_names, chatlog, rpc)
     # loop = asyncio.new_event_loop()
@@ -156,8 +159,14 @@ try:
             if firstTime:
                 run = True
                 while run:
-                    presence = presences.get_presence()
-                    rpc.set_rpc(presences.get_private_presence(presence))
+                    while True:
+                        presence = presences.get_presence()
+                        #wait until your own valorant presence is initialized
+                        if presences.get_private_presence(presence) != None:
+                            break
+                        time.sleep(5)
+                    if cfg.get_feature_flag("discord_rpc"):
+                        rpc.set_rpc(presences.get_private_presence(presence))
                     game_state = presences.get_game_state(presence)
                     if game_state != None:
                         run = False
@@ -192,6 +201,8 @@ try:
 
             if game_state == "INGAME":
                 coregame_stats = coregame.get_coregame_stats()
+                if coregame_stats == None:
+                    continue
                 Players = coregame_stats["Players"]
                 #data for chat to function
                 presence = presences.get_presence()
@@ -202,7 +213,8 @@ try:
                 players_data.update({"ignore": partyMembersList})
                 for player in Players:
                     if player["Subject"] == Requests.puuid:
-                        rpc.set_data({"agent": player["CharacterID"]})
+                        if cfg.get_feature_flag("discord_rpc"):
+                            rpc.set_data({"agent": player["CharacterID"]})
                     players_data.update({player["Subject"]: {"team": player["TeamID"], "agent": player["CharacterID"], "streamer_mode": player["PlayerIdentity"]["Incognito"]}})
                 Wss.set_player_data(players_data)
 
@@ -283,6 +295,9 @@ try:
                                     # PARTY_ICON
                                     party_icon = partyIcons[party]
                         playerRank = rank.get_rank(player["Subject"], seasonID)
+                        if player["Subject"] == Requests.puuid:
+                            if cfg.get_feature_flag("discord_rpc"):
+                                rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
                         # rankStatus = playerRank[1]
                         #useless code since rate limit is handled in the requestsV
                         # while not rankStatus:
@@ -339,7 +354,7 @@ try:
                         rr = playerRank["rr"]
 
                         #short peak rank string
-                        peakRankAct = f" ({playerRank['peakrankep']}e{playerRank['peakrankact']})"
+                        peakRankAct = f" (e{playerRank['peakrankep']}a{playerRank['peakrankact']})"
                         if not cfg.get_feature_flag("peak_rank_act"):
                             peakRankAct = ""
 
@@ -389,6 +404,8 @@ try:
             elif game_state == "PREGAME":
                 already_played_with = []
                 pregame_stats = pregame.get_pregame_stats()
+                if pregame_stats == None:
+                    continue
                 try:
                     server = GAMEPODS[pregame_stats["GamePodID"]]
                 except KeyError:
@@ -425,7 +442,8 @@ try:
                         playerRank = rank.get_rank(player["Subject"], seasonID)
 
                         if player["Subject"] == Requests.puuid:
-                            rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
+                            if cfg.get_feature_flag("discord_rpc"):
+                                rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
                         # rankStatus = playerRank[1]
                         #useless code since rate limit is handled in the requestsV
                         # while not rankStatus:
@@ -485,7 +503,7 @@ try:
                         rr = playerRank["rr"]
 
                         #short peak rank string
-                        peakRankAct = f" ({playerRank['peakrankep']}e{playerRank['peakrankact']})"
+                        peakRankAct = f" (e{playerRank['peakrankep']}a{playerRank['peakrankact']})"
                         if not cfg.get_feature_flag("peak_rank_act"):
                             peakRankAct = ""
                         # PEAK RANK
@@ -533,7 +551,8 @@ try:
                             playerRank = rank.get_rank(player["Subject"], seasonID)
 
                             if player["Subject"] == Requests.puuid:
-                                rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
+                                if cfg.get_feature_flag("discord_rpc"):
+                                    rpc.set_data({"rank": playerRank["rank"], "rank_name": colors.escape_ansi(NUMBERTORANKS[playerRank["rank"]]) + " | " + str(playerRank["rr"]) + "rr"})
 
                             # rankStatus = playerRank[1]
                             #useless code since rate limit is handled in the requestsV
@@ -564,7 +583,7 @@ try:
                             rr = playerRank["rr"]
 
                             #short peak rank string
-                            peakRankAct = f" ({playerRank['peakrankep']}e{playerRank['peakrankact']})"
+                            peakRankAct = f" (e{playerRank['peakrankep']}a{playerRank['peakrankact']})"
                             if not cfg.get_feature_flag("peak_rank_act"):
                                 peakRankAct = ""
 

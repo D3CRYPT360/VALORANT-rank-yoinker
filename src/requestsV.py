@@ -10,6 +10,7 @@ import sys
 import zipfile
 import io
 import subprocess
+from requests.exceptions import ConnectionError
 
 
 VALOAPI = []
@@ -81,6 +82,9 @@ class Requests:
                 self.log(f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"
                     f" response code: {response.status_code}")
 
+                if response.status_code == 404:
+                    return response.json()
+
                 try:
                     if response.json().get("errorCode") == "BAD_CLAIMS":
                         self.log("detected bad claims")
@@ -125,9 +129,20 @@ class Requests:
             elif url_type == "local":
                 local_headers = {'Authorization': 'Basic ' + base64.b64encode(
                     ('riot:' + self.lockfile['password']).encode()).decode()}
-                response = requests.request(method, f"https://127.0.0.1:{self.lockfile['port']}{endpoint}",
-                                            headers=local_headers,
-                                            verify=False)
+                
+                while True:
+                    try:
+                        response = requests.request(method, f"https://127.0.0.1:{self.lockfile['port']}{endpoint}",
+                                                    headers=local_headers,
+                                                    verify=False)
+                        if response.json().get("errorCode") == "RPC_ERROR":
+                            self.log("RPC_ERROR waiting 5 seconds")
+                            time.sleep(5)
+                        else:
+                            break
+                    except ConnectionError:
+                        print("Connection error, retrying in 5 seconds")
+                        time.sleep(5)
                 if endpoint != "/chat/v4/presences":
                     self.log(
                         f"fetch: url: '{url_type}', endpoint: {endpoint}, method: {method},"

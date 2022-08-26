@@ -4,7 +4,7 @@ from src.requestsV import Requests
 
 VALOAPI = Requests.VALOAPI()[0]
 
-version = "2.34"
+version = "2.43"
 enablePrivateLogging = True
 hide_names = True
 hide_levels = True
@@ -172,6 +172,7 @@ DEFAULT_CONFIG = {
             "auto_hide_leaderboard": True,
             "pre_cls": False,
             "game_chat": False,
-            "peak_rank_act": True
+            "peak_rank_act": True,
+            "discord_rpc": True
         }
     }
