@@ -1,7 +1,7 @@
 import requests
 from src.requestsV import Requests
 
-VALOAPI = Requests.VALOAPI()
+VALOAPI = Requests.VALOAPI()[0]
 
 class Content():
     def __init__(self, Requests, log):
@@ -24,7 +24,7 @@ class Content():
         agent_dict = {}
         agent_dict.update({None: None})
         agent_dict.update({"": ""})
-        for agent in rAgents["data"]:
+        for agent in rAgents:
             agent_dict.update({agent['uuid'].lower(): agent['displayName']})
         self.log(f"retrieved agent dict: {agent_dict}")
         return agent_dict
@@ -33,7 +33,7 @@ class Content():
         rMaps = VALOAPI["maps"]
         map_dict = {}
         map_dict.update({None: None})
-        for Vmap in rMaps["data"]:
+        for Vmap in rMaps:
             map_dict.update({Vmap['mapUrl'].lower(): Vmap['displayName']})
         self.log(f"retrieved map dict: {map_dict}")
         return map_dict

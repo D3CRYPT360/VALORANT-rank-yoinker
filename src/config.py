@@ -5,7 +5,7 @@ import requests
 import os
 from src.requestsV import Requests
 
-VALOAPI = Requests.VALOAPI()
+VALOAPI = Requests.VALOAPI()[0]
 
 from src.constants import DEFAULT_CONFIG
 

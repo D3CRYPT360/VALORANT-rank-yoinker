@@ -39,7 +39,7 @@ class Loadouts:
             inv = PlayerInventorys["Loadouts"][invindex]
             if state == "game":
                 inv = inv["Loadout"]
-            for weapon in valApiWeapons["data"]:
+            for weapon in valApiWeapons:
                 if weapon["displayName"].lower() == weaponChoose.lower():
                     skin_id = \
                         inv["Items"][weapon["uuid"].lower()]["Sockets"]["bcef87d6-209b-46c6-8b19-fbe40bd95abc"]["Item"][
@@ -157,7 +157,7 @@ class Loadouts:
                                     )
 
                     #append names to field
-                    for weapon in valoApiWeapons.json():
+                    for weapon in valoApiWeapons:
                         if skin == weapon["uuid"]:
                             final_json[players[i]["Subject"]]["Weapons"][skin].update(
                                 {
